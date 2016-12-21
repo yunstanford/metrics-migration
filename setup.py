@@ -6,7 +6,7 @@ base = os.path.dirname(os.path.abspath(__file__))
 
 README_PATH = os.path.join(base, "README.md")
 
-install_requires = ['aiographite', 'whisper']
+install_requires = ['aiographite']
 
 tests_require = []
 
