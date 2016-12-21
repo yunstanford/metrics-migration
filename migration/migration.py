@@ -41,14 +41,11 @@ class Migration:
 
 
     async def run(self):
-        # spawn write workers
-        # write_future = self.loop.run_in_executor(self.writer_executor, self.write_to_graphite)
-        write_future = asyncio.ensure_future(self.write_to_graphite())
-        # spawn read workers
-        # read_future = self.loop.run_in_executor(self.read_executor, self.read_from_wsps)
-        read_future = asyncio.ensure_future(self.read_from_wsps())
-        await read_future
-        await write_future
+        listener_task = asyncio.ensure_future(self.write_to_graphite())
+        producer_task = asyncio.ensure_future(self.read_from_wsps())
+        done, pending = await asyncio.wait(
+            [listener_task, producer_task],
+            return_when=asyncio.ALL_COMPLETED)
 
 
     async def write_to_graphite(self):
@@ -90,6 +87,7 @@ class Migration:
                 metrics = zip(range(*time_info), values)
                 for timestamp, value in metrics:
                     if value is not None:
+                        # await asyncio.sleep(0.1)
                         await self.queue.put((metric, value, timestamp))
                         print("reading {0}, {1}, {2}".format(metric, value, timestamp))
         # Send singal to writer, there is no data anymore
