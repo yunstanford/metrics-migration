@@ -3,6 +3,7 @@ from aiographite.protocol import PlaintextProtocol
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
 import whisper
+import os
 
 
 def default_schema_func(key):
@@ -30,19 +31,22 @@ class Migration:
 
     async def connect_to_graphite(self):
         self.graphite_conn = await connect(self.host,
-                                          self.port,
-                                          self.protocol,
-                                          loop=self.loop)
+                                           self.port,
+                                           self.protocol,
+                                           loop=self.loop)
+
 
     async def close_conn_to_graphite(self):
         await self.graphite_conn.close()
 
 
     async def run(self):
-        # spawn read workers
-        read_future = self.loop.run_in_executor(self.read_executor, self.read_from_wsps)
         # spawn write workers
-        write_future = self.loop.run_in_executor(self.writer_executor, self.write_to_graphite)
+        # write_future = self.loop.run_in_executor(self.writer_executor, self.write_to_graphite)
+        write_future = self.write_to_graphite()
+        # spawn read workers
+        # read_future = self.loop.run_in_executor(self.read_executor, self.read_from_wsps)
+        read_future = self.read_from_wsps()
         await read_future
         await write_future
 
@@ -51,12 +55,15 @@ class Migration:
         """
         Consumes the metrics in Queue and send to target graphite.
         """
+        print("start writing to graphite")
         while True:
             try:
                 future = self.queue.get()
                 metric, value, timestamp = await asyncio.wait_for(future, 20, loop=self.loop)
                 await self.graphite_conn.send(metric, value, timestamp)
+                print("writing {0}, {1}, {2}".format(metric, value, timestamp))
             except asyncio.futures.TimeoutError:
+                print("There is no data anymore")
                 break
 
 
@@ -65,18 +72,22 @@ class Migration:
         Read metrics from wsp file and then publish
         to an asyncio Queue.
         """
+        print("start reading from wsp")
+        prefix = os.path.basename(self.directory)
         for relative_path, full_path in self._extract_wsp():
             if full_path.endswith('.wsp'):
                 metric_path = relative_path.replace('/', '.')[:-4]
+                metric = "{0}{1}".format(prefix, metric_path)
                 try:
                     time_info, values = whisper.fetch(full_path, 0)
                 except whisper.CorruptWhisperFile:
-                    print 'Corrupt, skipping'
+                    # print('Corrupt, skipping')
                     continue
                 metrics = zip(range(*time_info), values)
                 for timestamp, value in metrics:
                     if value is not None:
-                        await self.queue.put((metric_path, value, timestamp))
+                        await self.queue.put((metric, value, timestamp))
+                        print("reading {0}, {1}, {2}".format(metric, value, timestamp))
 
 
     def _extract_wsp(self):
@@ -85,7 +96,7 @@ class Migration:
         it a generator.
         """
         directory = self.directory
-        if directory.endswith('/')
+        if directory.endswith('/'):
             directory = directory[:-1]
         for dirpath, dirnames, filenames in os.walk(directory):
             for filename in filenames:
