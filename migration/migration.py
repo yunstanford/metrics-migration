@@ -1,7 +1,6 @@
 from aiographite.aiographite import connect
 from aiographite.protocol import PlaintextProtocol
 import asyncio
-from concurrent.futures import ProcessPoolExecutor
 import whisper
 import os
 
@@ -25,8 +24,6 @@ class Migration:
         self.protocol = protocol or PlaintextProtocol()
         self.graphite_conn = None
         self.queue = asyncio.Queue(loop=self.loop)
-        self.writer_executor = ProcessPoolExecutor(1)
-        self.read_executor = ProcessPoolExecutor(4)
 
 
     async def connect_to_graphite(self):
@@ -79,6 +76,7 @@ class Migration:
             if full_path.endswith('.wsp'):
                 metric_path = relative_path.replace('/', '.')[:-4]
                 metric = "{0}{1}".format(prefix, metric_path)
+                metric = self.schema_func(metric)
                 try:
                     time_info, values = whisper.fetch(full_path, 0)
                 except whisper.CorruptWhisperFile:
