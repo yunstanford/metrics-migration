@@ -59,11 +59,15 @@ class Migration:
         while True:
             try:
                 future = self.queue.get()
-                metric, value, timestamp = await asyncio.wait_for(future, 20, loop=self.loop)
+                data = await asyncio.wait_for(future, 10, loop=self.loop)
+                if not data:
+                    print("There is no data anymore.")
+                    break
+                metric, value, timestamp = data
                 await self.graphite_conn.send(metric, value, timestamp)
                 print("writing {0}, {1}, {2}".format(metric, value, timestamp))
             except asyncio.futures.TimeoutError:
-                print("There is no data anymore")
+                print("writer is waiting too long...")
                 break
 
 
@@ -88,6 +92,8 @@ class Migration:
                     if value is not None:
                         await self.queue.put((metric, value, timestamp))
                         print("reading {0}, {1}, {2}".format(metric, value, timestamp))
+        # Send singal to writer, there is no data anymore
+        await self.queue.put(None)
 
 
     def _extract_wsp(self):
