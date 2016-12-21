@@ -43,10 +43,10 @@ class Migration:
     async def run(self):
         # spawn write workers
         # write_future = self.loop.run_in_executor(self.writer_executor, self.write_to_graphite)
-        write_future = self.write_to_graphite()
+        write_future = asyncio.ensure_future(self.write_to_graphite())
         # spawn read workers
         # read_future = self.loop.run_in_executor(self.read_executor, self.read_from_wsps)
-        read_future = self.read_from_wsps()
+        read_future = asyncio.ensure_future(self.read_from_wsps())
         await read_future
         await write_future
 
