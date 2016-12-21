@@ -3,8 +3,17 @@ import subprocess
 from uranium import task_requires
 
 
+ROOT = os.path.dirname(os.path.realpath("__file__"))
+WHISPER_FOR_PY3 = "https://github.com/graphite-project/whisper/tarball/feature/py3"
+
+
 def main(build):
     build.packages.install(".", develop=True)
+    build.packages.install("pip")
+    build.executables.run([
+        "{0}/bin/pip".format(ROOT), "install",
+        WHISPER_FOR_PY3,
+    ])
 
 
 @task_requires("main")

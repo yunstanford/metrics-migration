@@ -11,3 +11,4 @@ docs/_build
 __pycache__
 *.pyc
 .DS_Store
+pip-selfcheck.json
