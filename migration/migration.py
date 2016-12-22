@@ -92,6 +92,27 @@ class Migration:
         await self.queue.put(None)
 
 
+    async def send_one_wsp(self, storage_dir, metric, new_metric):
+        """
+        Send one wsp back to graphite with new metric name
+        """
+        clean_pattern = metric.replace('\\', '')
+        relative_path = clean_pattern.replace('.', '/')
+        full_path = "{0}/{1}.wsp".format(storage_dir, relative_path)
+        if os.path.exists(full_path):
+            try:
+                time_info, values = whisper.fetch(full_path, 0)
+                metrics = zip(range(*time_info), values)
+                for timestamp, value in metrics:
+                    if value is not None:
+                        await self.graphite_conn.send(new_metric, value, timestamp)
+                        print("writing {0}, {1}, {2}".format(new_metric, value, timestamp))
+            except whisper.CorruptWhisperFile as e:
+                raise e
+        else:
+            print("{0} doesn't exist".format(full_path))
+
+
     def _extract_wsp(self):
         """
         avoid to put all wsp files into memory once, let's make
