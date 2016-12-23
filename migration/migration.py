@@ -12,12 +12,14 @@ def default_schema_func(key):
 class Migration:
 
     def __init__(self, directory, host, port,
+                 prefix=None,
                  max_size_queue=None,
                  loop=None, schema_func=None,
                  protocol=None):
         self.directory = directory
         self.host = host
         self.port = port
+        self.prefix = prefix
         self.max_size = max_size_queue or 0
         self.loop = loop or asyncio.get_event_loop()
         self.schema_func = schema_func or default_schema_func
@@ -37,10 +39,12 @@ class Migration:
         await self.graphite_conn.close()
 
 
-    async def run(self, directory=None):
+    async def run(self, directory=None, prefix=None):
         # If you have any addional directory that you wanna migrate
         if directory:
             self.directory = directory
+        if prefix:
+            self.prefix = prefix
         listener_task = asyncio.ensure_future(self.write_to_graphite())
         producer_task = asyncio.ensure_future(self.read_from_wsps())
         done, pending = await asyncio.wait(
@@ -74,7 +78,7 @@ class Migration:
         to an asyncio Queue.
         """
         print("start reading from wsp")
-        prefix = os.path.basename(self.directory)
+        prefix = self.prefix or os.path.basename(self.directory)
         for relative_path, full_path in self._extract_wsp():
             if full_path.endswith('.wsp'):
                 metric_path = relative_path.replace('/', '.')[:-4]

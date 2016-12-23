@@ -86,6 +86,14 @@ def generate_new_schema_for_test_metric(test, verb):
     """
     generate new type of metrics based on test definition
     """
+    wheres = extract_info_from_where(test["where"], ["env", "feature", "host"])
+    zon = "zon"
+    metrics = "metrics"
+    env = wheres["env"]
+    service_id = wheres["feature"]
+    region_id = "wfc"
+    pool_id = wheres["host"]
+    test_name = test["name"]
 
 
 def is_test_metric(metric):
@@ -190,7 +198,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
