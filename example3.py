@@ -86,7 +86,7 @@ def generate_old_schema_for_test_metric(test, verb):
 
 def generate_new_schema_for_test_metric(test):
     """
-    generate new type of metrics based on test definition
+    generate test metrics with new schema based on test definition
     """
     wheres = extract_info_from_where(test["where"], ["env", "feature", "host"])
     zon = "zon"
@@ -108,6 +108,11 @@ def generate_new_schema_for_test_metric(test):
     metric_prefix_parts = [GraphiteEncoder.encode(part) for part in parts]
     return ".".join(metric_prefix_parts)
 
+
+def generate_new_schema_for_where_metric(test):
+    """
+    generate where metrics with new schema based on test definition
+    """
 
 
 def is_test_metric(metric):
