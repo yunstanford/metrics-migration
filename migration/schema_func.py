@@ -9,6 +9,11 @@ from aiographite.graphite_encoder import GraphiteEncoder
 
 
 def secrete_schema_func(metric):
+	pass
+
+
+def connect_to_db(hosts) :
+	pass
 
 
 
@@ -16,13 +21,11 @@ def is_test_metric(metric):
 	"""
 	old: zon.feature.env.host.name.type.*
 	"""
+	pass
 
 
 def is_where_metric(metric):
-
-
-
-
+	pass
 
 
 ################################

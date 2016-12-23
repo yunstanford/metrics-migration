@@ -49,3 +49,9 @@ def build_docs(build):
     return subprocess.call(
         ["make", "html"], cwd=os.path.join(build.root, "docs")
     )
+
+
+@task_requires("main")
+def secrete(build):
+    build.packages.install("motor")
+    build.packages.install("pyyaml")

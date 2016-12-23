@@ -37,7 +37,10 @@ class Migration:
         await self.graphite_conn.close()
 
 
-    async def run(self):
+    async def run(self, directory=None):
+        # If you have any addional directory that you wanna migrate
+        if directory:
+            self.directory = directory
         listener_task = asyncio.ensure_future(self.write_to_graphite())
         producer_task = asyncio.ensure_future(self.read_from_wsps())
         done, pending = await asyncio.wait(
