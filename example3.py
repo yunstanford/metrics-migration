@@ -57,7 +57,9 @@ async def go(storage_dir="/storage/whisper/zon"):
         print(test)
         print(verb)
         metric_prefix = generate_old_schema_for_test_metric(test, verb)
-        print("metric_prefix: {0}".format(metric_prefix))
+        print("old_metric_prefix: {0}".format(metric_prefix))
+        new_metric_prefix = generate_new_schema_for_test_metric(test)
+        print("new metric_prefix: {0}".format(new_metric_prefix))
         clean_pattern = metric_prefix.replace('\\', '')
         relative_dir = clean_pattern.replace('.', '/')
         directory = os.path.join(storage_dir, relative_dir)
@@ -82,7 +84,7 @@ def generate_old_schema_for_test_metric(test, verb):
     return metric_prefix
 
 
-def generate_new_schema_for_test_metric(test, verb):
+def generate_new_schema_for_test_metric(test):
     """
     generate new type of metrics based on test definition
     """
@@ -94,6 +96,18 @@ def generate_new_schema_for_test_metric(test, verb):
     region_id = "wfc"
     pool_id = wheres["host"]
     test_name = test["name"]
+    parts = [
+        zon,
+        metrics,
+        env,
+        service_id,
+        region_id,
+        pool_id,
+        test_name,
+    ]
+    metric_prefix_parts = [GraphiteEncoder.encode(part) for part in parts]
+    return ".".join(metric_prefix_parts)
+
 
 
 def is_test_metric(metric):
