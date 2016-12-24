@@ -40,8 +40,10 @@ def init_async_db():
     db = connection[db_config["db_name"]]
     return db
 
-
-async def go(storage_dir="/storage/whisper/zon"):
+##########################
+# Test Metric Migration  #
+##########################
+async def go_test_metric(storage_dir="/storage/whisper/zon"):
     print("=== Connecting to mongo ===")
     db = init_async_db()
     test_collection = db["tests"]
@@ -70,6 +72,25 @@ async def go(storage_dir="/storage/whisper/zon"):
     print("Takes: {0}".format(cost))
 
 
+###########################
+# Where Metric Migration  #
+###########################
+async def go_where_metric(storage_dir="/storage/whisper/zon"):
+    projection = {"where": 1, "result": 1, "alarming": 1}
+    print("=== Connecting to mongo ===")
+    db = init_async_db()
+    latest_results_collection = db["latest_results"]
+    import time
+    start = time.time()
+    print("=== Connected ===")
+    print("=== Start Iteration of latest_results collection ===")
+    async for latest_result in latest_results_collection.find({}, projection).limit(1):
+        #TODO
+
+
+####################
+# Helper Functions #
+####################
 def generate_old_schema_for_test_metric(test, verb):
     """
     generate old type of metrics based on test definition.
@@ -211,7 +232,7 @@ def get_graphite_metric_prefix(test, verb):
 loop = asyncio.get_event_loop()
 
 def main():
-    loop.run_until_complete(go())
+    loop.run_until_complete(go_test_metric())
     loop.close()
 
 
