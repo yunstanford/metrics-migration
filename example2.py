@@ -12,7 +12,7 @@ new_metric = 'hello.world'
 
 
 async def go():
-    migration_worker = Migration(directory, host, port, loop=loop)
+    migration_worker = Migration(directory, host, port, loop=loop, debug=True)
     await migration_worker.connect_to_graphite()
     await migration_worker.send_one_wsp(storage_dir, metric, new_metric)
     await migration_worker.close_conn_to_graphite()

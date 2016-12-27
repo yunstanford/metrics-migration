@@ -40,6 +40,7 @@ def init_async_db():
     db = connection[db_config["db_name"]]
     return db
 
+
 ##########################
 # Test Metric Migration  #
 ##########################
@@ -88,15 +89,17 @@ async def go_where_metric(storage_dir="/storage/whisper/zon"):
         #TODO
         wheres = latest_result["where"]
         for where in wheres:
+            print("where: {0}".format(where))
             metric_prefix = clean_key_for_where(where)
-            print("old metric prefix: {0}".format(old_metric_prefix))
+            print("old metric prefix: {0}".format(metric_prefix))
             new_metric_prefix = generate_new_schema_for_where_metric(where)
             print("new metric prefix: {0}".format(new_metric_prefix))
             # Target metric Directory in Current Storage Dir
             clean_pattern = metric_prefix.replace('\\', '')
             relative_dir = clean_pattern.replace('.', '/')
             directory = os.path.join(storage_dir, relative_dir)
-            print("Director: {0}".format(directory))
+            print("Directory: {0}".format(directory))
+
 
 ####################
 # Helper Functions #
@@ -144,21 +147,11 @@ def generate_new_schema_for_where_metric(where):
     """
     generate where metrics with new schema based on test definition
     """
-    return GraphiteEncoder.encode(where)
-
-
-def is_test_metric(metric):
-    """
-    old: zon.feature.env.host.name.type.*
-    """
-    # pass
-
-
-def is_where_metric(metric):
-    """
-    where metric
-    """
-    # pass
+    result = []
+    for item in where.split(","):
+        for part in item.split(":"):
+            result.append(GraphiteEncoder.encode(part))
+    return ".".join(result)
 
 
 ################################
@@ -244,6 +237,7 @@ loop = asyncio.get_event_loop()
 
 def main():
     loop.run_until_complete(go_test_metric())
+    loop.run_until_complete(go_where_metric())
     loop.close()
 
 
