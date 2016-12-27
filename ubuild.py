@@ -28,9 +28,9 @@ def test(build):
         "--cov", "migration",
         "--cov-report", "term-missing",
     ] + build.options.args)
-    build.executables.run([
-        "flake8", "migration", "tests"
-    ])
+    # build.executables.run([
+    #     "flake8", "migration", "tests"
+    # ])
 
 
 def distribute(build):

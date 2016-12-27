@@ -1,6 +1,15 @@
 metrics-migration
 =================
 
+.. image:: https://travis-ci.org/zillow/metrics-migration.svg?branch=master
+    :alt: build status
+    :target: https://travis-ci.org/zillow/metrics-migration
+
+.. image:: https://coveralls.io/repos/github/zillow/metrics-migration/badge.svg?branch=master
+    :alt: coverage status
+    :target: https://coveralls.io/github/zillow/metrics-migration?branch=master
+
+
 a simple tool to help you migrate your graphite metrics
 
 
