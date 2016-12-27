@@ -86,7 +86,17 @@ async def go_where_metric(storage_dir="/storage/whisper/zon"):
     print("=== Start Iteration of latest_results collection ===")
     async for latest_result in latest_results_collection.find({}, projection).limit(1):
         #TODO
-
+        wheres = latest_result["where"]
+        for where in wheres:
+            metric_prefix = clean_key_for_where(where)
+            print("old metric prefix: {0}".format(old_metric_prefix))
+            new_metric_prefix = generate_new_schema_for_where_metric(where)
+            print("new metric prefix: {0}".format(new_metric_prefix))
+            # Target metric Directory in Current Storage Dir
+            clean_pattern = metric_prefix.replace('\\', '')
+            relative_dir = clean_pattern.replace('.', '/')
+            directory = os.path.join(storage_dir, relative_dir)
+            print("Director: {0}".format(directory))
 
 ####################
 # Helper Functions #
@@ -130,10 +140,11 @@ def generate_new_schema_for_test_metric(test):
     return ".".join(metric_prefix_parts)
 
 
-def generate_new_schema_for_where_metric(test):
+def generate_new_schema_for_where_metric(where):
     """
     generate where metrics with new schema based on test definition
     """
+    return GraphiteEncoder.encode(where)
 
 
 def is_test_metric(metric):
