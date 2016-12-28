@@ -26,6 +26,17 @@ in several ways.
 
 
 -------------
+Dependency
+-------------
+
+Whisper on pypi only supports python2, we should download whisper egg from github.
+
+.. code::
+
+	pip3 install https://github.com/graphite-project/whisper/tarball/feature/py3
+
+
+-------------
 Examples
 -------------
 
