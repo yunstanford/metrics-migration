@@ -34,7 +34,7 @@ You can install aiographite globally with any Python package manager:
 
 .. code::
 
-	pip3 install metrics-migration
+    pip3 install metrics-migration
 
 
 -------------
@@ -45,7 +45,7 @@ Whisper on pypi only supports python2, we should download whisper egg from githu
 
 .. code::
 
-	pip3 install https://github.com/graphite-project/whisper/tarball/feature/py3
+    pip3 install https://github.com/graphite-project/whisper/tarball/feature/py3
 
 
 -------------
@@ -54,67 +54,102 @@ Examples
 
 Let's get started with several examples.
 
-Example 1.
+Example 1. A simple example to migrate a directory.
 
 .. code::
 
-	from migration.migration import Migration
-	import asyncio
+    from migration.migration import Migration
+    import asyncio
 
 
-	loop = asyncio.get_event_loop()
-	host = "127.0.0.1"
-	port = 2003
-	directory = '/Users/yunx/Documents/PROJECTS/metrics-migration/examples'
+    loop = asyncio.get_event_loop()
+    host = "127.0.0.1"
+    port = 2003
+    directory = '/Users/yunx/Documents/PROJECTS/metrics-migration/examples'
 
 
-	async def go():
-	    migration_worker = Migration(directory, host, port, loop=loop)
-	    await migration_worker.connect_to_graphite()
-	    await migration_worker.run()
-	    await migration_worker.close_conn_to_graphite()
+    async def go():
+        migration_worker = Migration(directory, host, port, loop=loop)
+        await migration_worker.connect_to_graphite()
+        await migration_worker.run()
+        await migration_worker.close_conn_to_graphite()
 
 
-	def main():
-	    loop.run_until_complete(go())
-	    loop.close()
+    def main():
+        loop.run_until_complete(go())
+        loop.close()
 
 
-	if __name__ == '__main__':
-	    main()
+    if __name__ == '__main__':
+        main()
 
 
-Example 2.
+Example 2. Migrate a whipser file with new metric.
 
 .. code::
 
-	from migration.migration import Migration
-	import asyncio
+    from migration.migration import Migration
+    import asyncio
 
 
-	loop = asyncio.get_event_loop()
-	host = "127.0.0.1"
-	port = 2003
-	directory = '/Users/yunx/Documents/PROJECTS/metrics-migration/examples'
-	storage_dir = '/Users/yunx/Documents/PROJECTS/metrics-migration'
-	metric = "examples.committedPoints"
-	new_metric = 'hello.world'
+    loop = asyncio.get_event_loop()
+    host = "127.0.0.1"
+    port = 2003
+    directory = '/Users/yunx/Documents/PROJECTS/metrics-migration/examples'
+    storage_dir = '/Users/yunx/Documents/PROJECTS/metrics-migration'
+    metric = "examples.committedPoints"
+    new_metric = 'hello.world'
 
 
-	async def go():
-	    migration_worker = Migration(directory, host, port, loop=loop, debug=True)
-	    await migration_worker.connect_to_graphite()
-	    await migration_worker.send_one_wsp(storage_dir, metric, new_metric)
-	    await migration_worker.close_conn_to_graphite()
+    async def go():
+        migration_worker = Migration(directory, host, port, loop=loop, debug=True)
+        await migration_worker.connect_to_graphite()
+        await migration_worker.send_one_wsp(storage_dir, metric, new_metric)
+        await migration_worker.close_conn_to_graphite()
 
 
-	def main():
-	    loop.run_until_complete(go())
-	    loop.close()
+    def main():
+        loop.run_until_complete(go())
+        loop.close()
 
 
-	if __name__ == '__main__':
-	    main()
+    if __name__ == '__main__':
+        main()
+
+
+Example 3. Have Multiple Directories to migrate ?
+
+.. code::
+
+    from migration.migration import Migration
+    import asyncio
+
+
+    loop = asyncio.get_event_loop()
+    host = "127.0.0.1"
+    port = 2003
+    directories_and_prefixes = [
+        ('/opt/graphite/metrics-migration/zon1', 'zon1'),
+        ('/opt/graphite/metrics-migration/zon2', 'zon2'),
+    ]
+
+
+    async def go():
+        migration_worker = Migration(directory, host, port, loop=loop)
+        await migration_worker.connect_to_graphite()
+        for (directory, prefix) in directories_and_prefixes:
+            wait migration_worker.run(directory=directory, prefix=prefix)
+        await migration_worker.run()
+        await migration_worker.close_conn_to_graphite()
+
+
+    def main():
+        loop.run_until_complete(go())
+        loop.close()
+
+
+    if __name__ == '__main__':
+        main()
 
 
 ------------
