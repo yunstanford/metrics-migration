@@ -10,7 +10,6 @@ metrics-migration
     :target: https://coveralls.io/github/yunstanford/metrics-migration?branch=master
 
 
-
 a simple tool to help you migrate your graphite metrics
 
 
