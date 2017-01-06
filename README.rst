@@ -5,7 +5,7 @@ metrics-migration
     :alt: build status
     :target: https://travis-ci.org/yunstanford/metrics-migration
 
-.. image:: https://coveralls.io/repos/github/yunstanford/metrics-migration/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/yunstanford/metrics-migration/badge.svg
     :alt: coverage status
     :target: https://coveralls.io/github/yunstanford/metrics-migration?branch=master
 
