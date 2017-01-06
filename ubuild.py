@@ -23,6 +23,7 @@ def test(build):
     build.packages.install("pytest-asyncio")
     build.packages.install("radon")
     build.packages.install("flake8")
+    build.packages.install("pytest-lamp")
     build.executables.run([
         "pytest", "./tests",
         "--cov", "migration",
