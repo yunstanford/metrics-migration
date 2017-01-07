@@ -9,6 +9,8 @@ metrics-migration
     :alt: coverage status
     :target: https://coveralls.io/github/yunstanford/metrics-migration?branch=master
 
+.. image:: https://coveralls.io/repos/github/yunstanford/metrics-migration/badge.svg?branch=master
+    :target: https://coveralls.io/github/yunstanford/metrics-migration?branch=master
 
 
 a simple tool to help you migrate your graphite metrics
