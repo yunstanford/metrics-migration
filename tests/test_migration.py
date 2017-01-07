@@ -86,6 +86,35 @@ async def test_write_to_graphite():
     await worker.close_conn_to_graphite()
 
 
+async def handler(reader, writer):
+    data = (await reader.read())
+    assert data == 'mondev 7 1483668388\n'
+    writer.write(data)
+    await writer.drain()
+    writer.close()
+
+
 @pytest.mark.asyncio
 async def test_send_one_wsp(monkeypatch):
-    pass
+    loop = asyncio.get_event_loop()
+    host = '127.0.0.1'
+    port = 2003
+    server = await asyncio.start_server(handler, host, port)
+    worker = Migration('/opt/graphite/storage/whisper/zon',
+                       host, port, loop=loop)
+    await worker.connect_to_graphite()
+    def fetch_mock_return(path, i):
+        return ((1483668388, 1483668390, 2), [7])
+
+    monkeypatch.setattr(whisper, 'fetch', fetch_mock_return)
+
+    def exist_mock_return(path):
+        return True
+
+    monkeypatch.setattr(os.path, 'exists', exist_mock_return)
+    storage = '/zon/where'
+    metric = 'velocity'
+    new_metric = 'mondev'
+
+    await worker.send_one_wsp(storage, metric, new_metric)    
+    server.close()
