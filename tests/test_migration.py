@@ -68,3 +68,24 @@ async def test_read_from_wsps(monkeypatch):
     assert data2 == ('zon.where', 8, 1483668390)
     assert terminator == None
 
+
+@pytest.mark.asyncio
+@asyncserver('127.0.0.1', 2003)
+async def test_write_to_graphite():
+    loop = asyncio.get_event_loop()
+    worker = Migration('/opt/graphite/storage/whisper/zon',
+                       '127.0.0.1', 2003, loop=loop)
+    await worker.connect_to_graphite()
+
+    # prefill some data into queue
+    data = ('zon.test.metric', 7, 1483668388)
+    await worker.queue.put(data)
+    await worker.queue.put(None)
+    # send data
+    await worker.write_to_graphite()
+    await worker.close_conn_to_graphite()
+
+
+@pytest.mark.asyncio
+async def test_send_one_wsp(monkeypatch):
+    pass
