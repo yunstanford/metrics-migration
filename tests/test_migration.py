@@ -118,3 +118,27 @@ async def test_send_one_wsp(monkeypatch):
 
     await worker.send_one_wsp(storage, metric, new_metric)    
     server.close()
+
+
+@pytest.mark.asyncio
+async def test_run(monkeypatch):
+    loop = asyncio.get_event_loop()
+    host = '127.0.0.1'
+    port = 2003
+    server = await asyncio.start_server(handler, host, port)
+    worker = Migration('/opt/graphite/storage/whisper/zon',
+                       host, port, loop=loop)
+    await worker.connect_to_graphite()
+    def fetch_mock_return(path, i):
+        return ((1483668388, 1483668390, 2), [7])
+    monkeypatch.setattr(whisper, 'fetch', fetch_mock_return)
+    def walk_mock_return(path):
+        yield ('/opt/graphite/storage/whisper/zon', [], ['where.wsp'])
+    monkeypatch.setattr(os, 'walk', walk_mock_return)
+
+    await worker.run()    
+    server.close()
+
+
+
+
