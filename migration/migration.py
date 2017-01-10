@@ -142,8 +142,8 @@ class Migration:
 
     async def __aenter__(self):
         await self.connect_to_graphite()
-        return self.graphite_conn
+        return self
 
 
-    async def __aexit__(self):
+    async def __aexit__(self, exc_type, exc, tb):
         await self.close_conn_to_graphite()
