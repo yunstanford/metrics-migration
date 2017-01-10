@@ -138,3 +138,12 @@ class Migration:
             for filename in filenames:
                 path = os.path.join(dirpath, filename)
                 yield path[len(directory):], path
+
+
+    async def __aenter__(self):
+        await self.connect_to_graphite()
+        return self.graphite_conn
+
+
+    async def __aexit__(self):
+        await self.close_conn_to_graphite()
