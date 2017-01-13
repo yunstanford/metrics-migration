@@ -88,8 +88,8 @@ class Migration:
         for relative_path, full_path in self._extract_wsp():
             if full_path.endswith('.wsp'):
                 metric_path = relative_path.replace('/', '.')[:-4]
+                metric_path = self.schema_func(metric_path)
                 metric = "{0}{1}".format(prefix, metric_path)
-                metric = self.schema_func(metric)
                 try:
                     time_info, values = whisper.fetch(full_path, 0)
                 except whisper.CorruptWhisperFile:
