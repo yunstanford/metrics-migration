@@ -11,8 +11,8 @@ install_requires = ['aiographite']
 tests_require = []
 
 setup(name='metrics-migration',
-      version='0.1.1',
-      description='',
+      version='0.1.2',
+      description='a simple tool to help you migrate graphite metrics',
       long_description=open(README_PATH).read(),
       author='Yun Xu',
       author_email='yunx@zillowgroup.com',
